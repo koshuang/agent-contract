@@ -1,0 +1,12 @@
+version: 1
+contract:
+  spec: "0.1"
+verification:
+  commands:
+    - npm test
+review:
+  disposition_required: true
+handoff:
+  path: .agents/HANDOFFS.md
+security:
+  destructive_operations: explicit-approval
