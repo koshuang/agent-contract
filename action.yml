@@ -1,0 +1,8 @@
+name: Agent Contract Check
+description: Validate repository conformance to Agent Contract
+runs:
+  using: composite
+  steps:
+    - name: Check Agent Contract
+      shell: bash
+      run: node "$GITHUB_ACTION_PATH/packages/cli/src/index.mjs" check --root "$GITHUB_WORKSPACE"
