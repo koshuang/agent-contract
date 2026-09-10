@@ -38,6 +38,7 @@ function check() {
   const agentsPath = path.join(root, 'AGENTS.md');
   const manifestPath = path.join(root, 'agent-contract.yml');
   const handoffPath = path.join(root, '.agents/HANDOFFS.md');
+  let inheritsShared = false;
 
   if (!fs.existsSync(manifestPath)) failures.push('agent-contract.yml is missing');
   if (!fs.existsSync(agentsPath)) failures.push('AGENTS.md is missing');
@@ -47,11 +48,12 @@ function check() {
     const manifest = read(manifestPath);
     if (!/^version:\s*1\s*$/m.test(manifest)) failures.push('manifest version must be 1');
     if (!/^contract:\s*$/m.test(manifest) || !/^\s+spec:\s*["']?0\.1["']?\s*$/m.test(manifest)) failures.push('contract.spec must declare 0.1');
+    inheritsShared = /^\s+inherits:\s*["']?shared["']?\s*$/m.test(manifest);
   }
 
   if (fs.existsSync(agentsPath)) {
     const text = read(agentsPath).toLowerCase();
-    const required = ['role', 'goal', 'can', 'cannot', 'escalate', 'verification', 'done'];
+    const required = inheritsShared ? ['verification'] : ['role', 'goal', 'can', 'cannot', 'escalate', 'verification', 'done'];
     for (const section of required) {
       const rx = new RegExp(`^#{1,6}\\s+.*${section}`, 'mi');
       if (!rx.test(text)) failures.push(`AGENTS.md missing ${section} section`);
@@ -64,7 +66,7 @@ function check() {
     return;
   }
 
-  console.log('Agent Contract check passed:\n✓ manifest\n✓ AGENTS.md\n✓ structured handoff');
+  console.log(`Agent Contract check passed:\n✓ manifest\n✓ AGENTS.md (${inheritsShared ? 'shared semantics inherited' : 'full contract'})\n✓ structured handoff`);
 }
 
 if (command === 'init') init();
